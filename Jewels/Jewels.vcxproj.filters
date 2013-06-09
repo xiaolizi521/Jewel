@@ -1,0 +1,117 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Engine">
+      <UniqueIdentifier>{8376289b-10b9-442f-b5f4-c75ad8762fb0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game">
+      <UniqueIdentifier>{798e6baf-5bcd-47b0-87f4-5b321331321d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\include">
+      <UniqueIdentifier>{eab0df9a-eee9-48f8-9790-a684bad5e331}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\src">
+      <UniqueIdentifier>{215a55e3-58a5-479b-8afb-eb4373562957}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\include">
+      <UniqueIdentifier>{5ae254bd-589b-496c-b007-8339941f820b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\src">
+      <UniqueIdentifier>{fa6ef033-8c67-44ee-82a2-3ffbc50ea431}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\States">
+      <UniqueIdentifier>{f5bf204f-d565-49ba-8f8d-f2b505962ae7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\States\include">
+      <UniqueIdentifier>{3e0f8b52-0b1d-469e-b4a5-7be35d776310}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\States\src">
+      <UniqueIdentifier>{1194ebb4-8cf9-4015-b451-a51c899b4a66}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine.cpp">
+      <Filter>Engine\src</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObject.cpp">
+      <Filter>Engine\src</Filter>
+    </ClCompile>
+    <ClCompile Include="Sprite.cpp">
+      <Filter>Engine\src</Filter>
+    </ClCompile>
+    <ClCompile Include="TextureMgr.cpp">
+      <Filter>Engine\src</Filter>
+    </ClCompile>
+    <ClCompile Include="Game.cpp">
+      <Filter>Game\src</Filter>
+    </ClCompile>
+    <ClCompile Include="Rect.cpp">
+      <Filter>Engine\src</Filter>
+    </ClCompile>
+    <ClCompile Include="AnimateFillingBoard.cpp">
+      <Filter>Game\States\src</Filter>
+    </ClCompile>
+    <ClCompile Include="RNG.cpp">
+      <Filter>Engine\src</Filter>
+    </ClCompile>
+    <ClCompile Include="Util.cpp">
+      <Filter>Game\src</Filter>
+    </ClCompile>
+    <ClCompile Include="DroppingJewels.cpp">
+      <Filter>Game\src</Filter>
+    </ClCompile>
+    <ClCompile Include="Vertex.cpp">
+      <Filter>Engine\src</Filter>
+    </ClCompile>
+    <ClCompile Include="Choosing.cpp">
+      <Filter>Game\States\src</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Engine.h">
+      <Filter>Engine\include</Filter>
+    </ClInclude>
+    <ClInclude Include="defines.h">
+      <Filter>Game\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Sprite.h">
+      <Filter>Engine\include</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObject.h">
+      <Filter>Engine\include</Filter>
+    </ClInclude>
+    <ClInclude Include="State.h">
+      <Filter>Engine\include</Filter>
+    </ClInclude>
+    <ClInclude Include="TextureMgr.h">
+      <Filter>Engine\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Game.h">
+      <Filter>Game\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Rect.h">
+      <Filter>Engine\include</Filter>
+    </ClInclude>
+    <ClInclude Include="AnimateFillingBoard.h">
+      <Filter>Game\States\include</Filter>
+    </ClInclude>
+    <ClInclude Include="RNG.h">
+      <Filter>Engine\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Util.h">
+      <Filter>Game\include</Filter>
+    </ClInclude>
+    <ClInclude Include="DroppingJewels.h">
+      <Filter>Game\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Vertex.h">
+      <Filter>Engine\include</Filter>
+    </ClInclude>
+    <ClInclude Include="Choosing.h">
+      <Filter>Game\States\include</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
