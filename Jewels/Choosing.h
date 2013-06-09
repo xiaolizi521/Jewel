@@ -28,11 +28,12 @@ public:
 
 protected:
   static Choosing m_Choosing;
-	Choosing() {}
+  Choosing(){}
 private:
-  bool bUpdate;
+  bool bFirstChosen;
   int iChoice;
-  std::pair<int,int> chosen[2];
+  std::pair<int,int> jewelOne;
+  std::pair<int,int> jewelTwo;
   Sprite * first;
   Sprite * second;
 };

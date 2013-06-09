@@ -126,8 +126,6 @@ void AnimateFillingBoard::Draw(Game* pGame)
       sprites[i]->Draw();
     }
   }
-
-  
 }
 
 /*************************************************************************/

@@ -36,8 +36,11 @@ public:
 
   // Jewel Game specific functions
   void InitialiseBoardCoordinates();
+  void InitialiseBoardSquares();
   void InitialiseBoard();
   
+  bool MouseInGrid(int iScreenX, int iScreenY, int * col, int * row);
+
   void PutJewel(int i, int j, JewelType t);
   void InsertDroppedJewels(int iWhichColumn);
   
@@ -47,6 +50,8 @@ public:
   std::vector<Vertex> GetDropCoords(int iWhich);
   std::vector<Vertex> GetDropTargetCoords(int iWhich);
 
+  // Swapping
+  bool PrepareToSwap(std::pair<int,int>&, std::pair<int,int>&);
 
   int GetCoordX(int col, int row){ return coords[col][row].x; }
   int GetCoordY(int col, int row){ return coords[col][row].y; }
@@ -74,7 +79,14 @@ private:
   int iCurrentTime;
   int iFrameTime;
 
-  // The grid coordinates are stored in a vector of vector<SDL_Rect>
+  // Rectangle defining grid area
+  Rect gridarea;
+
+  // Each square in the grid can be defined using a rect.
+  // Used to translate mouse presses.
+  std::vector<std::vector<Rect>> squares;
+
+  // The grid coordinates are stored in a vector of vector<Vertex>
   // coords are given as the centre of each slot.
   std::vector<std::vector<Vertex>> coords;
 

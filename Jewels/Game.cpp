@@ -6,9 +6,11 @@
 /*************************************************************************/
 
 Game::Game(SDL_Surface* pSurface):
-  pGameScreen(pSurface),
+    pGameScreen(pSurface),
+    gridarea(makeRect(GRID_START_X, GRID_START_Y, JEWELSIZE*NUM_COLUMNS, JEWELSIZE*NUM_ROWS)),
     coords(NUM_COLUMNS, std::vector<Vertex>(NUM_ROWS, makeVertex(0,0))),
     board(NUM_COLUMNS, std::vector<JewelType>(NUM_ROWS, JEWELTYPE_NONE)),
+    squares(NUM_COLUMNS, std::vector<Rect>(NUM_ROWS, makeRect(0,0,0,0))),
     dropColumns(NUM_COLUMNS),
     bBackgroundNeedsRedraw(true),
     bBoardNeedsRedraw(false),
@@ -19,7 +21,8 @@ Game::Game(SDL_Surface* pSurface):
   std::cout << "Creating new game";
   
   InitialiseBoardCoordinates();
-  
+  InitialiseBoardSquares();
+
   rng = RandomNumberGenerator::Instance();  
   rng->Initialise(9999, 0, (NUMJEWELTYPES-1));
 
@@ -48,6 +51,44 @@ void Game::InitialiseBoardCoordinates()
       coords[i][j].y = GRID_START_Y + (j * JEWELSIZE) + (JEWELSIZE/2);
     }
   }            
+}
+
+/*************************************************************************/
+
+void Game::InitialiseBoardSquares()
+{
+  for(int i = 0; i < NUM_COLUMNS; i++)
+  {
+    for(int j = 0; j < NUM_ROWS; j++)
+    {
+      squares[i][j].x = GRID_START_X + (i * JEWELSIZE); // centre of slot
+      squares[i][j].y = GRID_START_Y + (j * JEWELSIZE);
+      squares[i][j].w = JEWELSIZE;
+      squares[i][j].h = JEWELSIZE;
+    }
+  }            
+}
+
+/*************************************************************************/
+
+bool Game::MouseInGrid(int iScreenX, int iScreenY, int * col, int * row)
+{
+  if(pointInside(&gridarea, iScreenX, iScreenY))
+  {
+    for(int i = 0; i < NUM_COLUMNS; i++)
+    {
+      for(int j = 0; j < NUM_ROWS; j++)
+      {
+        if(pointInside(&squares[i][j], iScreenX, iScreenY))
+        {
+          *col = i; 
+          *row = j;
+          return true;
+        }
+      }
+    }
+  }
+  return false;
 }
 
 /*************************************************************************/
@@ -303,4 +344,11 @@ void Game::InsertDroppedJewels(int iWhichColumn)
     PutJewel(iWhichColumn, j, *i);
     j--;
   }
+}
+
+/************************************************************/
+
+bool Game::PrepareToSwap(std::pair<int,int>& one, std::pair<int,int>& two)
+{
+  return false;
 }
