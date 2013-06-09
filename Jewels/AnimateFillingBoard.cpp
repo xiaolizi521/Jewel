@@ -82,22 +82,23 @@ void AnimateFillingBoard::Update(Game * pGame)
  
   int iElapsed = pGame->GetElapsedTime();
 
-  if(iStart < 1 && !TimeLeft())
+  if(iStart < NUM_COLUMNS && !TimeLeft())
   {
     sprites[iStart]->Start();
     iStart++;
   }
 
-  for(int i = 0; i < 2; i++)
+  for(int i = 0; i < NUM_COLUMNS; i++)
   {
-    if(sprites[i]->Completed())
+    if( !sprites[i]->Completed() )
     {
-      //pGame->InsertDroppedJewels(i);
-      //iCompleted++;
-    }
-    else
-    {
+      std::cout << "Updating Dropping Jewels " << i << "\n";
       sprites[i]->Update(iElapsed);
+
+      if( sprites[i]->Completed() )
+      {
+        iCompleted++;
+      }
     }
   }
 
@@ -111,17 +112,16 @@ void AnimateFillingBoard::Update(Game * pGame)
 /*************************************************************************/
 
 void AnimateFillingBoard::Draw(Game* pGame)
-{
-  
-  pWiper->Blit(pGame->GetGameScreen(), GRID_START_X, GRID_START_Y);
-
-//  if(NUM_COLUMNS == iCompleted)
-//  {
-//    pGame->ChangeState(Choosing::Instance());
- // }
-//  else
+{ 
+  if(NUM_COLUMNS == iCompleted)
   {
-    for(int i = 0; i < 2; i++)
+    pGame->ChangeState(Choosing::Instance());
+  }
+  else
+  {
+    pWiper->Blit(pGame->GetGameScreen(), GRID_START_X, GRID_START_Y);
+
+    for(int i = 0; i < NUM_COLUMNS; i++)
     {
       sprites[i]->Draw();
     }

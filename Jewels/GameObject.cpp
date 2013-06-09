@@ -90,7 +90,7 @@ void GameObject::Update(int iElapsedMS)
   float distX = iElapsedMS * (iXVel/1000);
   float distY = iElapsedMS * (iYVel/1000);
 
-  for(std::vector<Rect>::size_type i = 0; i != coords.size(); i++)
+  for(std::vector<Vertex>::size_type i = 0; i != coords.size(); i++)
   {
     coords[i].x += static_cast<int>(distX);
     coords[i].y += static_cast<int>(distY);

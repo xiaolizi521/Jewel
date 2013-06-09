@@ -1,5 +1,6 @@
 #include "DroppingJewels.h"
 #include "defines.h"
+#include <iostream>
 
 const int VISIBLE = 1;
 
@@ -12,7 +13,7 @@ DroppingJewels::DroppingJewels(SDL_Surface * pSurf, std::vector<Sprite *> sv, st
       iVisibleFromY(iVis),
       visibility(sv.size(), 0),
       bDropped(false),
-      bRunning(false),
+      bStarted(false),
       targets(tv)
 {
   // base class part is now constructed.
@@ -26,35 +27,35 @@ DroppingJewels::DroppingJewels(SDL_Surface * pSurf, std::vector<Sprite *> sv, st
 // on their Y value
 void DroppingJewels::Update(int iElapsedMS)
 {
-  if( bRunning )
+  if( bStarted && !bDropped )
   {
-    GameObject::Update(iElapsedMS);
-  
-    if(iTargetY <= GetY(coords.size()-1) )
+    if(iTargetY > GetY(coords.size()-1) )
     {
-      bRunning = false;
-    }
+      std::cout << "Updating Dropping Jewels\n";
+      GameObject::Update(iElapsedMS);
 
-    // now check visibility
-    for(std::vector<Vertex>::size_type i = coords.size() - 1; 
-      i != (std::vector<Vertex>::size_type)-1; i--) 
-    {
-      if( coords[i].y-(JEWELSIZE/2) >= iVisibleFromY )
+      // now check visibility
+      for(std::vector<Vertex>::size_type i = coords.size() - 1; 
+        i != (std::vector<Vertex>::size_type)-1; i--) 
       {
+        if( coords[i].y-(JEWELSIZE/2) >= iVisibleFromY )
+        {
+          visibility[i] = 1;
+        }
+      }
+    }
+    else
+    {
+      bDropped = true;
+
+      // Put jewels in correct position ( in case we overshot )
+      for(std::vector<Vertex>::size_type i = coords.size() - 1; 
+        i != (std::vector<Vertex>::size_type)-1; i--) 
+      {
+        coords[i].y = targets[i].y;
         visibility[i] = 1;
       }
     }
-  }
-  else
-  {
-    // Put jewels in correct position ( in case we overshot )
-    for(std::vector<Vertex>::size_type i = coords.size() - 1; 
-      i != (std::vector<Vertex>::size_type)-1; i--) 
-    {
-      coords[i].y = targets[i].y;
-      visibility[i] = 1;
-    }
-    bDropped = true;
   }
 }
 

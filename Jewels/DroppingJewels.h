@@ -10,15 +10,15 @@ public:
   DroppingJewels(SDL_Surface * pSurf, std::vector<Sprite *> sv, std::vector<Vertex> cv,
                  std::vector<Vertex> tv, int iVis);
 
-  void Start() { bRunning = true; }
+  void Start() { bStarted = true; }
 
   void Update(int iElapsedMS);
   void Draw();
-
-  bool Completed() { return bDropped; }
+  
+  bool Completed() { return (bStarted && bDropped); }
 private:
   bool bDropped;
-  bool bRunning;
+  bool bStarted;
   int iTargetY;
   int iVisibleFromY;
 
