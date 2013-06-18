@@ -1,6 +1,14 @@
 #include "GameObject.h"
 #include <iostream>
 
+///////////////////////////////////////////////////////////////////////////////
+//
+// author: bithika mookherjee
+// email:  thumbelina@gmail.com
+// date:   2013-06-09
+// 
+///////////////////////////////////////////////////////////////////////////////
+
 /************************************************************/
 
 GameObject::GameObject(SDL_Surface * pSurf, std::vector<Sprite *> sv):

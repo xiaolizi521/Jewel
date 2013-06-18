@@ -15,6 +15,7 @@ Game::Game(SDL_Surface* pSurface):
     bBackgroundNeedsRedraw(true),
     bBoardNeedsRedraw(false),
     pBoardImage(makeRGBSurface(JEWELSIZE*NUM_COLUMNS, JEWELSIZE*NUM_ROWS)),
+    pBlankBoardImage(makeRGBSurface(JEWELSIZE*NUM_COLUMNS, JEWELSIZE*NUM_ROWS)),
     iCurrentTime(0),
     iFrameTime(0)
 {
@@ -37,10 +38,30 @@ Game::Game(SDL_Surface* pSurface):
   CreateJewelSprites();
   CreateBackgroundSprites();
 
+  WipeBoard();
   ChangeState(AnimateFillingBoard::Instance());
 }
 
 /*************************************************************************/
+
+void Game::WipeBoard()
+{
+  SDL_Rect src;
+  src.h = (JEWELSIZE*NUM_ROWS);
+  src.w = (JEWELSIZE*NUM_COLUMNS);
+  src.x = GRID_START_X;
+  src.y = GRID_START_Y;
+
+  SDL_Rect dst;
+  dst.x = 0;
+  dst.y = 0;
+
+  HTEXTURE bkg = TextureMgr::Instance()->GetTexture( BACKGROUND );
+  SDL_BlitSurface(bkg, &src, pBoardImage, &dst);
+}
+
+/*************************************************************************/
+
 void Game::InitialiseBoardCoordinates()
 {
   for(int i = 0; i < NUM_COLUMNS; i++)
@@ -102,6 +123,9 @@ void Game::CreateJewelSprites()
     jewel->SetAnchorPoint((tex->w)/2, (tex->h)/2); // anchor at the centre
     jewelSprites.push_back(jewel);
   }
+
+  HTEXTURE tex = TextureMgr::Instance()->GetTexture(HIGH_JEWEL);
+  pHighJewel = new Sprite(tex, 0, 0, tex->w, tex->h);
 }
 
 
@@ -135,19 +159,53 @@ void Game::PutJewel(int i, int j, JewelType t)
 }
 
 /*************************************************************************/
+
+void Game::HighlightJewel(int i, int j)
+{
+  // Mark slot[i][j] as being highlighted.
+  std::pair<int,int> choice = std::make_pair(i,j);
+  chosen.push_back(choice);
+}
+
+/*************************************************************************/
+std::vector<std::pair<int,int>> Game::GetChoices()
+{
+  return chosen;
+}
+
+
+/*************************************************************************/
+
 void Game::CreateColumnsForDropping()
 {
   for(int i = 0; i < NUM_COLUMNS; i++)
   {
-    // scan for first empty slot from bottom up 
+    int iEmpty = 0;
+    // count how many empty slots there are in this column.
     for(int j = NUM_ROWS-1; j >= 0; j--) 
     {
       if(board[i][j] == JEWELTYPE_NONE)
-      {
-        JewelType t = static_cast<JewelType>(rng->Random());
-        board[i][j] = t;
-        dropColumns[i].push_back(t);
+      {       
+        iEmpty++;
       }
+      else
+      {
+        if(iEmpty > 0 )
+        {
+          // the next non-empty slot goes into the drop column
+          dropColumns[i].push_back(board[i][j]);
+
+          // and we set this to NULL
+          board[i][j] = JEWELTYPE_NONE;
+        }
+      }
+    }
+
+    // refill the empties from the other side.
+    for(int iFill = 0; iFill < iEmpty; iFill++)
+    {
+      JewelType t = static_cast<JewelType>(rng->Random());
+      dropColumns[i].push_back(t);
     }
   }
 }
@@ -197,7 +255,7 @@ void Game::Update(Engine* pEngine)
 
 void Game::SetBoardRedraw(bool bRedraw)
 {
-  bBoardNeedsRedraw = false;
+  bBoardNeedsRedraw = bRedraw;
 }
 
 /*************************************************************************/
@@ -214,14 +272,33 @@ void Game::DrawBackground()
 
 void Game::DrawBoard()
 {
+  PrintBoard();
+  WipeBoard();
   // Blit stationary jewels
   for(int i = 0; i < NUM_COLUMNS; i++)
   {
     for(int j = 0; j < NUM_ROWS; j++)
     {
-      jewelSprites[static_cast<int>(board[i][j])]->Blit(pBoardImage, coords[i][j].x, coords[i][j].y);
+      if(JEWELTYPE_NONE != board[i][j])
+      {
+        jewelSprites[static_cast<int>(board[i][j])]->Blit(pBoardImage, coords[i][j].x-GRID_START_X, coords[i][j].y-GRID_START_Y);
+        //pTimeLeftSprite->Blit(pBoardImage, coords[i][j].x, coords[i][j].y);
+      }
     }
   }
+
+  // now blit pBoardImage to the screen
+  SDL_Rect src;
+  src.x = 0;
+  src.y = 0;
+  src.h = JEWELSIZE*NUM_ROWS;
+  src.w = JEWELSIZE*NUM_COLUMNS;
+
+  SDL_Rect dst;
+  dst.x = GRID_START_X;
+  dst.y = GRID_START_Y;
+  SDL_BlitSurface(pBoardImage, NULL, pGameScreen, &dst);
+  //SDL_Flip(m_pCanvas);
 }
 
 /*************************************************************************/
@@ -301,6 +378,13 @@ Sprite * Game::GetGridWiper()
 
 /************************************************************/
 
+Sprite * Game::GetHighlight()
+{
+  return pHighJewel;
+}
+
+/************************************************************/
+
 std::vector<Vertex> Game::GetDropCoords(int iWhich)
 {
   std::vector<Vertex> dropCoords;
@@ -348,7 +432,60 @@ void Game::InsertDroppedJewels(int iWhichColumn)
 
 /************************************************************/
 
+void Game::RemoveJewels(std::vector<std::pair<int,int>> chosen)
+{
+  std::vector<std::pair<int,int>>::iterator it = chosen.begin();
+
+  while(it != chosen.end())
+  {
+    board[it->first][it->second] = JEWELTYPE_NONE;
+    it++;
+  }
+
+  bBoardNeedsRedraw = true;
+
+}
+
+/************************************************************/
 bool Game::PrepareToSwap(std::pair<int,int>& one, std::pair<int,int>& two)
 {
   return false;
+}
+
+/************************************************************/
+
+void Game::PrintBoard()
+{
+  std::cout << "B O A R D \n";
+  for(int i = 0; i < NUM_COLUMNS; i++)
+  {
+    for(int j = 0; j < NUM_ROWS; j++)
+    { 
+      std::cout << board[i][j] << " ";
+    }
+    std::cout << "\n";
+  }
+
+  std::cout << "\n\n";
+}
+
+/************************************************************/
+
+void Game::DropAllColumns()
+{
+  for(int i = 0; i < NUM_COLUMNS; i++)
+  {
+    if(!dropColumns[i].empty())
+    {
+      // work from the top down, find the first ocupied slot and 
+      // drop the column on to it.
+      std::vector<JewelType>::reverse_iterator it = board[i].rbegin();
+      while(it != board[i].rend() && *it != JEWELTYPE_NONE)
+      {
+        it++;
+      }
+      std::vector<JewelType>::reverse_iterator it2 = board[i].rend();
+      board[i].insert(it2, dropColumns[i].begin(), dropColumns[i].end());
+    }
+  }
 }

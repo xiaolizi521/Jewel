@@ -14,10 +14,10 @@ const int NUMBERS = 3;
 const int SELECTED_JEWEL = 4;
 const int SWAPWIPER = 5;
 const int STARTMENU = 6;
-
+const int HIGH_JEWEL = 7;
 
 // Jewel Defines
-const int JEWEL_START_ID = 7;
+const int JEWEL_START_ID = 8;
 const int NUMJEWELTYPES = 5;
 
 typedef enum 
@@ -47,6 +47,7 @@ static TextureResource textures[] =
   {"chosen.png", SELECTED_JEWEL},
   {"menuState.png", STARTMENU},
   {"swap_wiper.png", SWAPWIPER},
+  {"highlight.png", HIGH_JEWEL},
   {"Red.png", JEWEL_START_ID},
   {"Blue.png", JEWEL_START_ID+1},
   {"Yellow.png", JEWEL_START_ID+2},

@@ -41,6 +41,11 @@ public:
   
   bool MouseInGrid(int iScreenX, int iScreenY, int * col, int * row);
 
+  void HighlightJewel(int i, int j);
+  std::vector<std::pair<int,int>> GetChoices();
+  Sprite * GetHighlight();
+  void RemoveJewels(std::vector<std::pair<int,int>> chosen);
+
   void PutJewel(int i, int j, JewelType t);
   void InsertDroppedJewels(int iWhichColumn);
   
@@ -49,6 +54,7 @@ public:
   std::vector<Sprite *>  MakeSpritesForDropping(std::vector<JewelType>& drop);
   std::vector<Vertex> GetDropCoords(int iWhich);
   std::vector<Vertex> GetDropTargetCoords(int iWhich);
+  void DropAllColumns();
 
   // Swapping
   bool PrepareToSwap(std::pair<int,int>&, std::pair<int,int>&);
@@ -70,6 +76,8 @@ public:
 
   SDL_Surface * GetGameScreen() { return pGameScreen; }
 
+  void PrintBoard();
+  void WipeBoard();
 private:
   std::vector<State<Game>*> states;
   SDL_Surface * pGameScreen;
@@ -96,6 +104,9 @@ private:
   // Columns of jewels type and sprites - used for animating drops
   std::vector<std::vector<JewelType>> dropColumns;
 
+  // Highlights
+  std::vector<std::pair<int,int>> chosen;
+
   // Sprites 
   std::vector<Sprite *> jewelSprites;
   Sprite * pBkg;
@@ -104,9 +115,11 @@ private:
   Sprite * pMarker;
   Sprite * pEmpty;
   Sprite * pGridWiper;
+  Sprite * pHighJewel;
 
   // Drawing 
   SDL_Surface * pBoardImage;
+  SDL_Surface * pBlankBoardImage;
   bool bBackgroundNeedsRedraw;
   bool bBoardNeedsRedraw;
 };

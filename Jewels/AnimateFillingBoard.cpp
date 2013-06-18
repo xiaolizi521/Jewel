@@ -3,7 +3,7 @@
 #include "GameObject.h"
 #include <iostream>
 #include "Util.h"
-#include "Choosing.h"
+#include "DisappearAndDropTests.h"
 
 /*************************************************************************/
 AnimateFillingBoard::AnimateFillingBoard():
@@ -104,6 +104,7 @@ void AnimateFillingBoard::Update(Game * pGame)
 
   if(NUM_COLUMNS == iCompleted)
   {
+    pGame->DropAllColumns();
     pGame->SetBoardRedraw(true);
     std::cout << "DONE!";
   }
@@ -115,7 +116,12 @@ void AnimateFillingBoard::Draw(Game* pGame)
 { 
   if(NUM_COLUMNS == iCompleted)
   {
-    pGame->ChangeState(Choosing::Instance());
+    pGame->PrintBoard();
+
+    // force the board to redraw
+    pGame->SetBoardRedraw(true);
+
+    pGame->ChangeState(DisappearAndDropTest::Instance());
   }
   else
   {
