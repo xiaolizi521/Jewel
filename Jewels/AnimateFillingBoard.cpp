@@ -17,31 +17,11 @@ AnimateFillingBoard::AnimateFillingBoard():
 
 /*************************************************************************/
 
-void AnimateFillingBoard::CreateSprites(Game* pGame)
+void AnimateFillingBoard::Enter(Game* pGame)
 {
   pGame->CreateColumnsForDropping();
   
-  for(int i = 0; i < NUM_COLUMNS; i++)
-  {   
-    std::vector<JewelType> vj = pGame->GetDroppingColumn(i);
-    std::vector<Sprite *> vs = pGame->MakeSpritesForDropping(vj);
-    std::vector<Vertex> vv = pGame->GetDropCoords(i);
-    std::vector<Vertex> vt = pGame->GetDropTargetCoords(i);
-    
-    sprites[i] = new DroppingJewels(pGame->GetGameScreen(), vs, vv, vt, GRID_START_Y);
-
-    sprites[i]->SetVelocity(0.0, DROP_SPEED);
-  }
-
   pWiper = pGame->GetGridWiper();
-}
-
-/*************************************************************************/
-
-void AnimateFillingBoard::Enter(Game* pGame)
-{
-  
-  CreateSprites(pGame);
 }
 
 /*************************************************************************/
@@ -82,39 +62,18 @@ void AnimateFillingBoard::Update(Game * pGame)
  
   int iElapsed = pGame->GetElapsedTime();
 
-  if(iStart < NUM_COLUMNS && !TimeLeft())
-  {
-    sprites[iStart]->Start();
-    iStart++;
-  }
 
-  for(int i = 0; i < NUM_COLUMNS; i++)
-  {
-    if( !sprites[i]->Completed() )
-    {
-      std::cout << "Updating Dropping Jewels " << i << "\n";
-      sprites[i]->Update(iElapsed);
+  // update each of the dropping jewels.
+  pGame->UpdateAllDropColumns(iElapsed);
 
-      if( sprites[i]->Completed() )
-      {
-        iCompleted++;
-      }
-    }
-  }
-
-  if(NUM_COLUMNS == iCompleted)
-  {
-    pGame->DropAllColumns();
-    pGame->SetBoardRedraw(true);
-    std::cout << "DONE!";
-  }
 }
 
 /*************************************************************************/
 
 void AnimateFillingBoard::Draw(Game* pGame)
-{ 
-  if(NUM_COLUMNS == iCompleted)
+{
+
+  if(pGame->AllColumnsDropped())
   {
     pGame->PrintBoard();
 
@@ -127,10 +86,7 @@ void AnimateFillingBoard::Draw(Game* pGame)
   {
     pWiper->Blit(pGame->GetGameScreen(), GRID_START_X, GRID_START_Y);
 
-    for(int i = 0; i < NUM_COLUMNS; i++)
-    {
-      sprites[i]->Draw();
-    }
+    pGame->DrawAllDropColumns();
   }
 }
 

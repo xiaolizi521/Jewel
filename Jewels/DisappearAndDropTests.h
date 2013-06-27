@@ -37,8 +37,8 @@ private:
   Sprite * first;
   Sprite * second;
 
-  std::vector<std::pair<int,int>> chosen;
-  std::vector<std::pair<int,int>>::reverse_iterator it;
+  std::deque<std::pair<int,int>> chosen;
+  std::deque<std::pair<int,int>>::reverse_iterator it;
 };
 
 #endif

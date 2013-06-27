@@ -1,42 +1,55 @@
 #include "Util.h"
 
+std::ostream& operator<<(std::ostream& os, const Rect& obj)
+{
+  os << "{" << obj.x << "," << obj.y << " w: " << obj.w << " h: " << obj.h << " }";
+  return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const Vertex& obj)
+{
+  os << "[" << obj.x << "," << obj.y << "]";
+  return os;
+}
+
 std::ostream& operator<<(std::ostream& os, const JewelType& obj)
 {
   switch(obj)
   {
     case JEWELTYPE_RED:
     {
-      os << "RED";
+      os << "[R]";
     }
     break;
     case JEWELTYPE_BLUE:
     {
-      os << "BLUE";
+      os << "[B]";
     }
     break;
     case JEWELTYPE_AMBER:
     {
-      os << "AMBER";
+      os << "[Y]";
     }
     break;
     case JEWELTYPE_EMERALD:
     {
-      os << "EMERALD";
+      os << "[G]";
     }
     break;
     case JEWELTYPE_PURPLE:
     {
-      os << "PURPLE";
+      os << "[P]";
     }
     break;
     case JEWELTYPE_NONE:
     {
-      os << "NONE";
+      os << "[0]";
     }
     break;
   }
   return os;
 }
+
 
 SDL_Surface * makeRGBSurface(int iW, int iH)
 {

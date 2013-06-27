@@ -41,7 +41,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>C:\SDL_image-1.2.12\SDL_image-1.2.12;C:\SDL-devel-1.2.15-VC\SDL-1.2.15\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\boost_1_50_0\boost_1_50_0;C:\SDL_image-1.2.12\SDL_image-1.2.12;C:\SDL-devel-1.2.15-VC\SDL-1.2.15\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>

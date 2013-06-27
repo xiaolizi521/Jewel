@@ -6,15 +6,18 @@ const int VISIBLE = 1;
 
 /************************************************************/
 
-DroppingJewels::DroppingJewels(SDL_Surface * pSurf, std::vector<Sprite *> sv, std::vector<Vertex> cv, 
-                std::vector<Vertex> tv, int iVis):
-      GameObject(pSurf, sv, cv),
-      iTargetY(tv.back().y),
-      iVisibleFromY(iVis),
-      visibility(sv.size(), 0),
-      bDropped(false),
+DroppingJewels::DroppingJewels(SDL_Surface * pSurf, 
+                               std::deque<Sprite *> sprites, 
+                               std::deque<Vertex> startcoords,
+                               std::deque<Vertex> endcoords,
+                               int iDropFrom):
+      GameObject(pSurf, sprites, startcoords),
+      targets(endcoords),
+      iVisibleFromY(GRID_START_Y+(JEWELSIZE/2)),
+      iHeight(sprites.size() * JEWELSIZE),
       bStarted(false),
-      targets(tv)
+      bDropped(false),
+      visibility(coords.size(), 0)
 {
   // base class part is now constructed.
   SetVelocity(0.0, DROP_SPEED);
@@ -27,50 +30,49 @@ DroppingJewels::DroppingJewels(SDL_Surface * pSurf, std::vector<Sprite *> sv, st
 // on their Y value
 void DroppingJewels::Update(int iElapsedMS)
 {
-  if( bStarted && !bDropped )
+  if( !bDropped )
   {
-    if(iTargetY > GetY(coords.size()-1) )
-    {
-      std::cout << "Updating Dropping Jewels\n";
-      GameObject::Update(iElapsedMS);
+    GameObject::Update(iElapsedMS);
 
-      // now check visibility
-      for(std::vector<Vertex>::size_type i = coords.size() - 1; 
-        i != (std::vector<Vertex>::size_type)-1; i--) 
+    std::deque<Vertex>::iterator target_it = targets.begin();
+    std::deque<int>::iterator vis_it = visibility.begin();
+
+    foreach_(Vertex v, coords)
+    {
+      if(v.y > iVisibleFromY)
       {
-        if( coords[i].y-(JEWELSIZE/2) >= iVisibleFromY )
-        {
-          visibility[i] = 1;
-        }
+        *vis_it = 1;
       }
+      
+      if( v.y >= target_it->y)
+      {
+        // bDropped = true;
+        v.y = target_it->y;
+      }
+      vis_it++;
+      target_it++;
     }
-    else
+
+    if(coords.back().y >= targets.back().y)
     {
       bDropped = true;
-
-      // Put jewels in correct position ( in case we overshot )
-      for(std::vector<Vertex>::size_type i = coords.size() - 1; 
-        i != (std::vector<Vertex>::size_type)-1; i--) 
-      {
-        coords[i].y = targets[i].y;
-        visibility[i] = 1;
-      }
+      visibility.assign(sprites.size(), 1);
     }
   }
+
 }
 
 /************************************************************/
 
 void DroppingJewels::Draw()
 {
-  for(std::vector<Vertex>::size_type i = coords.size() - 1; 
-    i != (std::vector<Vertex>::size_type)-1; i--) 
+  int i = 0;
+  foreach_(Sprite * s, sprites)
   {
-    if( VISIBLE == visibility[i] )
+    if( 1 == visibility[i] )
     {
-      sprites[i]->Blit(pSurface, coords[i].x, coords[i].y);
+      s->Blit(pSurface, coords[i].x, coords[i].y);
     }
+    i++;
   }
 }
-
-/************************************************************/

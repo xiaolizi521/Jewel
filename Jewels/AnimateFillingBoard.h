@@ -7,7 +7,7 @@
 #include "Sprite.h"
 #include "DroppingJewels.h"
 #include "TextureMgr.h"
-#include <vector>
+#include <deque>
 #include "defines.h"
 
 class AnimateFillingBoard: public State<Game>
@@ -38,7 +38,7 @@ private:
   
   int TimeLeft(void);
 
-  std::vector<DroppingJewels* > sprites;
+  std::deque<DroppingJewels* > sprites;
   Sprite* pWiper;
   SDL_Surface * pGameScreen;
   int iStart;

@@ -4,14 +4,14 @@
 #include <SDL.h>
 #include "Sprite.h"
 #include "Vertex.h"
-#include <vector>
+#include <deque>
 
 class GameObject
 {
 
   public:
-    GameObject(SDL_Surface * pSurf, std::vector<Sprite*> sv);
-    GameObject(SDL_Surface * pSurf, std::vector<Sprite*> sv, std::vector<Vertex> cv);
+    GameObject(SDL_Surface * pSurf, std::deque<Sprite*> sv);
+    GameObject(SDL_Surface * pSurf, std::deque<Sprite*> sv, std::deque<Vertex> cv);
 
     virtual void SetVelocity(float xvel, float yvel);
     virtual void SetPosition(int x, int y, int which = 0);
@@ -36,8 +36,8 @@ class GameObject
     float iXVel;
     float iYVel;
     
-    std::vector<Vertex>     coords;
-    std::vector<Sprite *> sprites;
+    std::deque<Vertex>     coords;
+    std::deque<Sprite *> sprites;
   
   private:
 

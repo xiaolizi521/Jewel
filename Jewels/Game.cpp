@@ -3,15 +3,41 @@
 #include <iostream>
 #include "AnimateFillingBoard.h"
 
+
+void PrintColumn(std::deque<JewelType> & col)
+{
+  foreach_( JewelType j, col )
+  {
+    std::cout << j;
+  }
+  std::cout << "\n";
+}
+
+void PrintCoordColumn(std::deque<Vertex> d)
+{
+  foreach_( Vertex v, d )
+  {
+    std::cout << v << ", ";
+  }
+  std::cout << "\n";
+}
+
+void Game::PrintCoordCol( int iWhich )
+{
+  PrintCoordColumn( coords[iWhich] );
+}
+
+
 /*************************************************************************/
 
 Game::Game(SDL_Surface* pSurface):
     pGameScreen(pSurface),
     gridarea(makeRect(GRID_START_X, GRID_START_Y, JEWELSIZE*NUM_COLUMNS, JEWELSIZE*NUM_ROWS)),
-    coords(NUM_COLUMNS, std::vector<Vertex>(NUM_ROWS, makeVertex(0,0))),
-    board(NUM_COLUMNS, std::vector<JewelType>(NUM_ROWS, JEWELTYPE_NONE)),
-    squares(NUM_COLUMNS, std::vector<Rect>(NUM_ROWS, makeRect(0,0,0,0))),
+    coords(NUM_COLUMNS, std::deque<Vertex>(NUM_ROWS, makeVertex(0,0))),
+    board(NUM_COLUMNS, std::deque<JewelType>(NUM_ROWS, JEWELTYPE_NONE)),
+    squares(NUM_COLUMNS, std::deque<Rect>(NUM_ROWS, makeRect(0,0,0,0))),
     dropColumns(NUM_COLUMNS),
+    dropSprites(NUM_COLUMNS),
     bBackgroundNeedsRedraw(true),
     bBoardNeedsRedraw(false),
     pBoardImage(makeRGBSurface(JEWELSIZE*NUM_COLUMNS, JEWELSIZE*NUM_ROWS)),
@@ -131,7 +157,7 @@ void Game::CreateJewelSprites()
 
 /*************************************************************************/
 
-std::vector<Sprite*> Game::GetJewelSprites()
+std::deque<Sprite*> Game::GetJewelSprites()
 {
   return jewelSprites;  
 }
@@ -168,63 +194,119 @@ void Game::HighlightJewel(int i, int j)
 }
 
 /*************************************************************************/
-std::vector<std::pair<int,int>> Game::GetChoices()
+std::deque<std::pair<int,int>> Game::GetChoices()
 {
   return chosen;
 }
 
+/*************************************************************************/
+
+void Game::PushRandomJewelToDropColumn( int iWhich )
+{
+  dropColumns[iWhich].push_front(static_cast<JewelType>(rng->Random()));
+}
 
 /*************************************************************************/
+
+void Game::CreateDropColumn(int iWhich)
+{
+   iEmpties = 0;
+   iBottom = -1;
+
+   // get the topmost empty in this columnn
+   foreach_( JewelType j, board[iWhich])
+   {
+     if(JEWELTYPE_NONE == j)
+     {
+       iEmpties++;
+     }
+     else
+     {
+       if(0 == iEmpties)
+       {
+         iBottom++;
+       }
+     }
+   }
+
+   std::cout << "\nBOTTOM " << iBottom << "\n";
+
+   
+   int iSubsetSize = iBottom+1;
+
+   std::deque<JewelType>::iterator it = board[iWhich].begin();
+
+   dropColumns[iWhich].assign(it, board[iWhich].begin()+iSubsetSize);
+
+   for(;it != board[iWhich].begin()+iSubsetSize; it++)
+   {
+     *it = JEWELTYPE_NONE;
+   }  
+
+   for(int i = 0; i < iEmpties; i++)
+   {
+     std::cout << "Pushing empty " << i << "\n";
+     PushRandomJewelToDropColumn(iWhich);
+   }
+
+   PrintColumn(dropColumns[iWhich]);
+   PrintColumn(board[iWhich]);
+}
 
 void Game::CreateColumnsForDropping()
 {
   for(int i = 0; i < NUM_COLUMNS; i++)
   {
-    int iEmpty = 0;
-    // count how many empty slots there are in this column.
-    for(int j = NUM_ROWS-1; j >= 0; j--) 
-    {
-      if(board[i][j] == JEWELTYPE_NONE)
-      {       
-        iEmpty++;
-      }
-      else
-      {
-        if(iEmpty > 0 )
-        {
-          // the next non-empty slot goes into the drop column
-          dropColumns[i].push_back(board[i][j]);
-
-          // and we set this to NULL
-          board[i][j] = JEWELTYPE_NONE;
-        }
-      }
-    }
-
-    // refill the empties from the other side.
-    for(int iFill = 0; iFill < iEmpty; iFill++)
-    {
-      JewelType t = static_cast<JewelType>(rng->Random());
-      dropColumns[i].push_back(t);
-    }
+    CreateDropSprite(i);
   }
 }
 
 /*************************************************************************/
-std::vector<Sprite *> Game::MakeSpritesForDropping(std::vector<JewelType>& drop)
+
+void Game::CreateDropSprite(int iWhich)
 {
-  std::vector<Sprite *> sprites;
+  CreateDropColumn(iWhich);
+  PrintCoordCol(iWhich);
 
-  for(std::vector<JewelType*>::size_type i = 0; i != drop.size(); i++)
+  std::deque<Sprite *> sprites;
+
+  foreach_(JewelType j, dropColumns[iWhich])
   {
-    sprites.push_back(jewelSprites[drop[i]]);
+    sprites.push_back(jewelSprites[static_cast<int>(j)]);
   }
-  return sprites;
+
+  // init a deque of coordinates for initial positions of the jewels.
+  std::deque<Vertex> startcoords;
+
+  // we already stored the number of empties in CreateDropColumnFrom();
+  int iOffsetY = (iEmpties * (JEWELSIZE-1)) + (JEWELSIZE/2);
+  std::deque<Vertex>::iterator it = coords[iWhich].begin();
+  foreach_(JewelType j, dropColumns[iWhich])
+  {
+    Vertex v = makeVertex((*it).x, (*it).y-iOffsetY);
+    *it++;
+    startcoords.push_back(v);
+  }
+
+  DroppingJewels * dj = new DroppingJewels(pGameScreen, sprites, startcoords,
+                                     coords[iWhich], iBottom);
+  dropSprites.push_back(dj);
+
+  PrintCoordColumn(startcoords);
+  PrintCoordColumn(coords[iWhich]);
+  
 }
 
 /*************************************************************************/
 
-std::vector<JewelType> Game::GetDroppingColumn(int iWhichColumn)
+void Game::StartDropColumn( int iWhich )
+{
+  dropSprites[iWhich]->Start();
+}
+
+/*************************************************************************/
+
+std::deque<JewelType> Game::GetDroppingColumn(int iWhichColumn)
 {
   return dropColumns[iWhichColumn];
 }
@@ -385,9 +467,9 @@ Sprite * Game::GetHighlight()
 
 /************************************************************/
 
-std::vector<Vertex> Game::GetDropCoords(int iWhich)
+std::deque<Vertex> Game::GetDropCoords(int iWhich)
 {
-  std::vector<Vertex> dropCoords;
+  std::deque<Vertex> dropCoords;
   
   int x = coords[iWhich][0].x;
   int length = static_cast<int>(dropColumns[iWhich].size());
@@ -402,9 +484,9 @@ std::vector<Vertex> Game::GetDropCoords(int iWhich)
 
 /************************************************************/
 
-std::vector<Vertex> Game::GetDropTargetCoords(int iWhich)
+std::deque<Vertex> Game::GetDropTargetCoords(int iWhich)
 {
-   std::vector<Vertex> targetCoords;
+   std::deque<Vertex> targetCoords;
   
   int x = coords[iWhich][0].x;
   int length = static_cast<int>(dropColumns[iWhich].size());
@@ -422,7 +504,7 @@ void Game::InsertDroppedJewels(int iWhichColumn)
 {
   int j = dropColumns[iWhichColumn].size()-1;
 
-  for(std::vector<JewelType>::reverse_iterator i = dropColumns[iWhichColumn].rbegin();
+  for(std::deque<JewelType>::reverse_iterator i = dropColumns[iWhichColumn].rbegin();
       i != dropColumns[iWhichColumn].rend(); i++)
   {
     PutJewel(iWhichColumn, j, *i);
@@ -432,9 +514,9 @@ void Game::InsertDroppedJewels(int iWhichColumn)
 
 /************************************************************/
 
-void Game::RemoveJewels(std::vector<std::pair<int,int>> chosen)
+void Game::RemoveJewels(std::deque<std::pair<int,int>> chosen)
 {
-  std::vector<std::pair<int,int>>::iterator it = chosen.begin();
+  std::deque<std::pair<int,int>>::iterator it = chosen.begin();
 
   while(it != chosen.end())
   {
@@ -479,13 +561,56 @@ void Game::DropAllColumns()
     {
       // work from the top down, find the first ocupied slot and 
       // drop the column on to it.
-      std::vector<JewelType>::reverse_iterator it = board[i].rbegin();
+      std::deque<JewelType>::reverse_iterator it = board[i].rbegin();
       while(it != board[i].rend() && *it != JEWELTYPE_NONE)
       {
         it++;
       }
-      std::vector<JewelType>::reverse_iterator it2 = board[i].rend();
-      board[i].insert(it2, dropColumns[i].begin(), dropColumns[i].end());
+      std::deque<JewelType>::reverse_iterator it2 = board[i].rend();
+      //board[i].insert(it2, dropColumns[i].begin(), dropColumns[i].end());
     }
   }
+}
+
+/************************************************************/
+
+void Game::UpdateAllDropColumns(int iTimeElapsed)
+{
+  foreach_(DroppingJewels * dj, dropSprites)
+  {
+    if(dj)
+    {
+      dj->Update(iTimeElapsed);
+    }
+  }
+}
+
+/************************************************************/
+
+void Game::DrawAllDropColumns()
+{
+  foreach_(DroppingJewels * dj, dropSprites)
+  {
+    if(dj)
+    {
+      dj->Draw();
+    }
+  }
+}
+
+/************************************************************/
+
+bool Game::AllColumnsDropped()
+{
+  foreach_(DroppingJewels *dj, dropSprites)
+  {
+    if(dj)
+    {
+      if(!dj->Completed())
+      {
+        return false;
+      }
+    }
+  }
+  return true;
 }

@@ -11,7 +11,7 @@
 
 /************************************************************/
 
-GameObject::GameObject(SDL_Surface * pSurf, std::vector<Sprite *> sv):
+GameObject::GameObject(SDL_Surface * pSurf, std::deque<Sprite *> sv):
   iXVel(0),
   iYVel(0),
   sprites(sv),
@@ -23,7 +23,7 @@ GameObject::GameObject(SDL_Surface * pSurf, std::vector<Sprite *> sv):
 
 /************************************************************/
 
-GameObject::GameObject(SDL_Surface * pSurf, std::vector<Sprite *> sv, std::vector<Vertex> cv):
+GameObject::GameObject(SDL_Surface * pSurf, std::deque<Sprite *> sv, std::deque<Vertex> cv):
   iXVel(0),
   iYVel(0),
   sprites(sv),
@@ -98,10 +98,11 @@ void GameObject::Update(int iElapsedMS)
   float distX = iElapsedMS * (iXVel/1000);
   float distY = iElapsedMS * (iYVel/1000);
 
-  for(std::vector<Vertex>::size_type i = 0; i != coords.size(); i++)
+  for(std::deque<Vertex>::size_type i = 0; i != coords.size(); i++)
   {
     coords[i].x += static_cast<int>(distX);
     coords[i].y += static_cast<int>(distY);
+    //std::cout << "x, y = " << coords[i].x << " " << coords[i].y << "\n";
   }
  
 }
@@ -110,7 +111,7 @@ void GameObject::Update(int iElapsedMS)
 
 void GameObject::Draw()
 {
-  for(std::vector<Sprite*>::size_type i = 0; i != sprites.size(); i++)
+  for(std::deque<Sprite*>::size_type i = 0; i != sprites.size(); i++)
   {
     sprites[i]->Blit(pSurface, coords[i].x, coords[i].y);  
   } 

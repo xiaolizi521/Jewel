@@ -5,7 +5,7 @@
 #include "SDL.h"
 #include "Sprite.h"
 #include "Game.h"
-#include <vector>
+#include <deque>
 
 
 

@@ -1,6 +1,10 @@
 #ifndef _DEFINES_H_
 #define _DEFINES_H_
 
+#include <boost/foreach.hpp>
+
+#define foreach_ BOOST_FOREACH 
+
 // Screen Dimensions
 const char GAME_TITLE[] = "Jewel Game";
 const int SCREEN_WIDTH = 755;

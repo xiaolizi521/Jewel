@@ -7,8 +7,12 @@
 class DroppingJewels : public GameObject
 {
 public:
-  DroppingJewels(SDL_Surface * pSurf, std::vector<Sprite *> sv, std::vector<Vertex> cv,
-                 std::vector<Vertex> tv, int iVis);
+  DroppingJewels(){}
+  DroppingJewels::DroppingJewels(SDL_Surface * pSurf, 
+                                 std::deque<Sprite *> sprites, 
+                                 std::deque<Vertex> startcoords,
+                                 std::deque<Vertex> endcoords,
+                                 int iDropFrom);
 
   void Start() { bStarted = true; }
 
@@ -16,14 +20,16 @@ public:
   void Draw();
   
   bool Completed() { return (bStarted && bDropped); }
+
 private:
+  int  iHeight;
   bool bDropped;
   bool bStarted;
   int iTargetY;
   int iVisibleFromY;
 
-  std::vector<Vertex> targets;
-  std::vector<int> visibility;
+  std::deque<Vertex> targets;
+  std::deque<int> visibility;
 };
 
 #endif
